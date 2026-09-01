@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design token values — UI_UX.md Section 17 ("Design Tokens").
+ * Colors are expressed as "H S% L%" triplets (no hsl() wrapper) because
+ * tailwind.config.ts wraps each one in hsl(var(--token)) itself. This is
+ * the single place these values are defined; nothing else in the codebase
+ * should hardcode a color value that has an equivalent token here.
+ */
+@layer base {
+  :root {
+    /* Neutral / background / text — UI_UX.md §17.1 */
+    --background: 40 20% 98%; /* off-white page background */
+    --foreground: 160 10% 12%; /* near-black body text, not pure black */
+
+    --muted: 150 10% 94%; /* light grey */
+    --muted-foreground: 150 5% 45%; /* mid-grey captions/metadata */
+
+    --border: 150 15% 88%;
+    --input: 150 15% 88%;
+    --ring: 152 45% 28%;
+
+    /* Primary brand — deep green (UI_UX.md §8.2) */
+    --primary: 152 45% 28%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary/accent — warm amber/gold */
+    --secondary: 38 85% 55%;
+    --secondary-foreground: 160 10% 12%;
+
+    --accent: 38 85% 55%;
+    --accent-foreground: 160 10% 12%;
+
+    /* Status colors — always paired with an icon + label, never color alone (UI_UX.md §2.2) */
+    --success: 142 60% 32%;
+    --success-foreground: 0 0% 100%;
+    --success-tint: 142 55% 94%;
+
+    --warning: 38 92% 45%;
+    --warning-foreground: 0 0% 100%;
+    --warning-tint: 38 90% 94%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Border radius base (UI_UX.md §17.4 — radius-md) */
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+}

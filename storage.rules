@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isOwner(shopId) {
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/owners/$(request.auth.uid))
+        && firestore.get(/databases/(default)/documents/owners/$(request.auth.uid)).data.role == 'owner'
+        && firestore.get(/databases/(default)/documents/owners/$(request.auth.uid)).data.shopId == shopId;
+    }
+    function validImage() {
+      return request.resource != null
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+    match /shops/{shopId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isOwner(shopId) && (request.resource == null || validImage());
+    }
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}

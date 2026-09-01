@@ -1,0 +1,15 @@
+export { AuthProvider } from './components/AuthProvider';
+export { RequireOwner } from './components/RequireOwner';
+export { LoginForm } from './components/LoginForm';
+export type { LoginFormProps } from './components/LoginForm';
+export { useAuth } from './hooks/useAuth';
+export { useRequireOwner } from './hooks/useRequireOwner';
+export { useOwnerLogin } from './hooks/useOwnerLogin';
+export type { RequireOwnerResult } from './hooks/useRequireOwner';
+export type { RequireOwnerProps } from './components/RequireOwner';
+export type { UseOwnerLoginResult } from './hooks/useOwnerLogin';
+export type { SessionTier, AuthSession, AuthContextValue } from './types';
+export type { OwnerLoginFormValues, OwnerLoginFieldErrors } from './schema';
+export { isOwnerSession, isAnonymousSession, isPhoneLinkedSession } from './utils/session';
+export { linkPhoneCredentialToCurrentUser } from './services/authService';
+export { PhoneVerificationPanel } from './components/PhoneVerificationPanel';

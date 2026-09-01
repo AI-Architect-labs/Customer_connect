@@ -1,0 +1,5 @@
+'use client';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
+import { cn } from '@/lib/utils';
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>{variant?:'primary'|'secondary'|'outline'|'danger'|'ghost';size?:'sm'|'md'|'lg';}
+export const Button=forwardRef<HTMLButtonElement,ButtonProps>(function Button({className,variant='primary',size='md',...props},ref){return <button ref={ref} className={cn('inline-flex min-h-11 items-center justify-center rounded-md font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',variant==='primary'&&'bg-primary text-primary-foreground hover:opacity-90',variant==='secondary'&&'bg-secondary text-secondary-foreground',variant==='outline'&&'border bg-background hover:bg-muted',variant==='danger'&&'bg-destructive text-destructive-foreground',variant==='ghost'&&'hover:bg-muted',size==='sm'&&'px-3 py-2 text-sm',size==='md'&&'px-4 py-2.5',size==='lg'&&'px-5 py-3 text-lg',className)} {...props}/>;});

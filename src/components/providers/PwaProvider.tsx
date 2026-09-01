@@ -1,0 +1,2 @@
+'use client';
+import{useEffect,type ReactNode}from'react';import{logger}from'@/lib/utils/logger';import{initializeFirebaseAppCheck}from'@/lib/firebase/appCheck';export function PwaProvider({children}:{children:ReactNode}){useEffect(()=>{initializeFirebaseAppCheck();if('serviceWorker'in navigator){navigator.serviceWorker.register('/sw.js').catch(error=>logger.warn('Service worker registration failed',{error:error instanceof Error?error.message:String(error)}));}},[]);return <>{children}</>}

@@ -1,0 +1,5 @@
+# Python helper dependencies used by repository maintenance/bootstrap scripts.
+# The application itself is Next.js/TypeScript; JavaScript dependencies are
+# canonically declared in package.json and functions/package.json.
+firebase-admin>=6.6,<7
+python-dotenv>=1.0,<2

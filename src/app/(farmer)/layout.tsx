@@ -1,0 +1,1 @@
+import type{ReactNode}from'react';import{FarmerNav}from'@/components/shared/FarmerNav';export default function FarmerLayout({children}:{children:ReactNode}){return <div className="min-h-screen pb-20 md:pb-0"><div className="mx-auto max-w-6xl">{children}</div><FarmerNav/></div>;}

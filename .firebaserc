@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "agriconnect-dev",
+    "dev": "agriconnect-dev",
+    "staging": "agriconnect-staging",
+    "prod": "agriconnect-prod"
+  }
+}

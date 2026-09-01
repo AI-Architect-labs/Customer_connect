@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function ownerDoc() {
+      return get(/databases/$(database)/documents/owners/$(request.auth.uid));
+    }
+    function isOwner(shopId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/owners/$(request.auth.uid))
+        && ownerDoc().data.role == 'owner'
+        && ownerDoc().data.shopId == shopId;
+    }
+    function phoneVerified() {
+      return signedIn() && request.auth.token.phone_number is string;
+    }
+    function validAuditCreate() {
+      return request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.updatedBy == request.auth.uid;
+    }
+    function immutableAuditFields() {
+      return request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt;
+    }
+    function validCategory() {
+      return request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.sortOrder is number
+        && request.resource.data.sortOrder >= 0
+        && request.resource.data.active is bool;
+    }
+    function validProduct() {
+      return request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.categoryId is string
+        && request.resource.data.categoryId.size() > 0
+        && request.resource.data.unit in ['kg', 'litre', 'piece', 'packet']
+        && request.resource.data.packSize is number
+        && request.resource.data.packSize > 0
+        && request.resource.data.mrp is number
+        && request.resource.data.mrp > 0
+        && (!('discountPrice' in request.resource.data)
+          || (request.resource.data.discountPrice is number
+            && request.resource.data.discountPrice > 0
+            && request.resource.data.discountPrice <= request.resource.data.mrp))
+        && request.resource.data.availabilityStatus in ['available', 'low_stock', 'out_of_stock']
+        && request.resource.data.images is list
+        && request.resource.data.images.size() >= 1
+        && request.resource.data.images.size() <= 6
+        && request.resource.data.active is bool;
+    }
+
+    match /owners/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      // Owner tenancy/role is privileged identity configuration. Provision via Admin tooling only.
+      allow create, update, delete: if false;
+      match /devices/{deviceId} {
+        allow read, write: if false;
+      }
+    }
+
+    match /shops/{shopId} {
+      allow get: if resource.data.active == true || isOwner(shopId);
+      allow list: if isOwner(shopId);
+      allow create: if isOwner(shopId)
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.phone is string
+        && request.resource.data.active is bool;
+      allow update: if isOwner(shopId)
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && immutableAuditFields()
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.phone is string
+        && request.resource.data.active is bool;
+      allow delete: if false;
+
+      match /categories/{categoryId} {
+        allow read: if isOwner(shopId) || resource.data.active == true;
+        allow create: if isOwner(shopId) && validCategory() && validAuditCreate();
+        allow update: if isOwner(shopId)
+          && validCategory()
+          && immutableAuditFields()
+          && request.resource.data.updatedBy == request.auth.uid;
+        allow delete: if false;
+      }
+
+      match /products/{productId} {
+        allow read: if isOwner(shopId) || resource.data.active == true;
+        allow create: if isOwner(shopId) && validProduct() && validAuditCreate();
+        allow update: if isOwner(shopId)
+          && validProduct()
+          && immutableAuditFields()
+          && request.resource.data.updatedBy == request.auth.uid;
+        allow delete: if false;
+      }
+
+      match /orders/{orderId} {
+        allow read: if isOwner(shopId)
+          || (phoneVerified() && resource.data.customerPhone == request.auth.token.phone_number);
+        // Trusted callable Functions own all writes and use Admin SDK.
+        allow create, update, delete: if false;
+      }
+
+      match /customers/{phone} {
+        allow read: if isOwner(shopId);
+        allow create, update, delete: if false;
+      }
+    }
+
+    // Cloud Functions-only abuse-control documents.
+    match /_rateLimits/{uid} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
