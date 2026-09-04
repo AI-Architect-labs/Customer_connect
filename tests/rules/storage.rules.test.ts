@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 import {
   assertFails,
@@ -10,7 +12,7 @@ import { getBytes, ref, uploadBytes } from 'firebase/storage';
 import { readFileSync } from 'node:fs';
 
 let env: RulesTestEnvironment;
-const projectId = 'demo-agriconnect-storage-rules';
+const projectId = process.env.GCLOUD_PROJECT ?? 'agriconnect-dev';
 
 beforeAll(async () => {
   env = await initializeTestEnvironment({
@@ -70,6 +72,13 @@ describe('Storage rules', () => {
       uploadBytes(ref(storage, 'shops/shop1/products/p1/file.txt'), new Uint8Array([1]), {
         contentType: 'text/plain',
       }),
+    );
+  });
+
+  it('denies an upload without content-type metadata', async () => {
+    const storage = env.authenticatedContext('owner1').storage();
+    await assertFails(
+      uploadBytes(ref(storage, 'shops/shop1/products/p1/no-content-type.jpg'), new Uint8Array([1])),
     );
   });
 });
