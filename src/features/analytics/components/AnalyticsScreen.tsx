@@ -1,3 +1,73 @@
 'use client';
-import{useMemo,useState}from'react';import{useAuth}from'@/features/auth';import{useOwnerOrders}from'@/features/orders';import{computeDashboardAnalytics}from'../services/analyticsService';import{Input}from'@/components/ui/Input';import{Card}from'@/components/ui/Card';
-export function AnalyticsScreen(){const{session}=useAuth();const{orders}=useOwnerOrders(session?.ownerProfile?.shopId??'');const[from,setFrom]=useState('');const[to,setTo]=useState('');const filtered=useMemo(()=>orders.filter(o=>{const d=o.createdAt.toDate();return(!from||d>=new Date(`${from}T00:00:00`))&&(!to||d<=new Date(`${to}T23:59:59`));}),[orders,from,to]);const a=computeDashboardAnalytics(filtered);return <div><h1 className="mb-4 text-2xl font-extrabold">Sales Analytics</h1><div className="mb-5 flex flex-wrap gap-3"><label>From<Input type="date" value={from} onChange={e=>setFrom(e.target.value)}/></label><label>To<Input type="date" value={to} onChange={e=>setTo(e.target.value)}/></label></div><div className="grid gap-4 md:grid-cols-2"><Card><h2 className="font-bold">Revenue</h2><p className="text-3xl font-extrabold text-primary">₹{filtered.filter(o=>o.status!=='cancelled').reduce((n,o)=>n+o.subtotal,0).toLocaleString('en-IN')}</p><p className="text-muted-foreground">{filtered.length} orders in selected range</p></Card><Card><h2 className="mb-2 font-bold">Customers</h2><p>New: <strong>{a.newCustomers}</strong></p><p>Repeat: <strong>{a.repeatCustomers}</strong></p></Card><Card className="md:col-span-2"><h2 className="mb-3 font-bold">Best-selling products</h2><div className="space-y-2">{a.bestSellers.map(x=><div key={x.name} className="grid grid-cols-[1fr_auto_auto] gap-4"><span>{x.name}</span><strong>{x.qty} units</strong><span>₹{x.revenue.toLocaleString('en-IN')}</span></div>)}</div></Card></div></div>}
+import { useMemo, useState } from 'react';
+import { useAuth } from '@/features/auth';
+import { useOwnerOrders } from '@/features/orders';
+import { computeDashboardAnalytics } from '../services/analyticsService';
+import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
+export function AnalyticsScreen() {
+  const { session } = useAuth();
+  const { orders } = useOwnerOrders(session?.ownerProfile?.shopId ?? '');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const filtered = useMemo(
+    () =>
+      orders.filter((o) => {
+        const d = o.createdAt.toDate();
+        return (
+          (!from || d >= new Date(`${from}T00:00:00`)) && (!to || d <= new Date(`${to}T23:59:59`))
+        );
+      }),
+    [orders, from, to],
+  );
+  const a = computeDashboardAnalytics(filtered);
+  return (
+    <div>
+      <h1 className="mb-4 text-2xl font-extrabold">Sales Analytics</h1>
+      <div className="mb-5 flex flex-wrap gap-3">
+        <label>
+          From
+          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+        </label>
+        <label>
+          To
+          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+        </label>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <h2 className="font-bold">Revenue</h2>
+          <p className="text-3xl font-extrabold text-primary">
+            ₹
+            {filtered
+              .filter((o) => o.status !== 'cancelled')
+              .reduce((n, o) => n + o.subtotal, 0)
+              .toLocaleString('en-IN')}
+          </p>
+          <p className="text-muted-foreground">{filtered.length} orders in selected range</p>
+        </Card>
+        <Card>
+          <h2 className="mb-2 font-bold">Customers</h2>
+          <p>
+            New: <strong>{a.newCustomers}</strong>
+          </p>
+          <p>
+            Repeat: <strong>{a.repeatCustomers}</strong>
+          </p>
+        </Card>
+        <Card className="md:col-span-2">
+          <h2 className="mb-3 font-bold">Best-selling products</h2>
+          <div className="space-y-2">
+            {a.bestSellers.map((x) => (
+              <div key={x.name} className="grid grid-cols-[1fr_auto_auto] gap-4">
+                <span>{x.name}</span>
+                <strong>{x.qty} units</strong>
+                <span>₹{x.revenue.toLocaleString('en-IN')}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}

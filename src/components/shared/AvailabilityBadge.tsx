@@ -1,3 +1,23 @@
-import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react'; import type { AvailabilityStatus } from '@/constants/enums'; import { cn } from '@/lib/utils';
-const data={available:{label:'Available',icon:CheckCircle2,classes:'bg-success-tint text-success'},low_stock:{label:'Low Stock',icon:AlertTriangle,classes:'bg-warning-tint text-warning'},out_of_stock:{label:'Out of Stock',icon:XCircle,classes:'bg-red-50 text-destructive'}} as const;
-export function AvailabilityBadge({status}: {status:AvailabilityStatus}){const item=data[status];const Icon=item.icon;return <span className={cn('inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',item.classes)}><Icon className="h-4 w-4" aria-hidden/><span>{item.label}</span></span>;}
+import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import type { AvailabilityStatus } from '@/constants/enums';
+import { cn } from '@/lib/utils';
+const data = {
+  available: { label: 'Available', icon: CheckCircle2, classes: 'bg-success-tint text-success' },
+  low_stock: { label: 'Low Stock', icon: AlertTriangle, classes: 'bg-warning-tint text-warning' },
+  out_of_stock: { label: 'Out of Stock', icon: XCircle, classes: 'bg-red-50 text-destructive' },
+} as const;
+export function AvailabilityBadge({ status }: { status: AvailabilityStatus }) {
+  const item = data[status];
+  const Icon = item.icon;
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold',
+        item.classes,
+      )}
+    >
+      <Icon className="h-4 w-4" aria-hidden />
+      <span>{item.label}</span>
+    </span>
+  );
+}

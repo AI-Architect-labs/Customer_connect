@@ -1,4 +1,126 @@
 'use client';
-import{useEffect,useState}from'react';import{useForm}from'react-hook-form';import{zodResolver}from'@hookform/resolvers/zod';import{shopFormSchema,type ShopFormInput,type ShopFormValue}from'@/schemas/shopSchema';import{useAuth}from'@/features/auth';import{useShop}from'../../hooks/useShop';import{saveShopProfile}from'../../services/shopService';import{Input}from'@/components/ui/Input';import{Textarea}from'@/components/ui/Textarea';import{Button}from'@/components/ui/Button';import{useToast}from'@/components/providers/ToastProvider';
-export function ShopSettingsScreen(){const{session}=useAuth();const shopId=session?.ownerProfile?.shopId??'';const{shop,loading}=useShop(shopId);const[file,setFile]=useState<File|undefined>();const{showToast}=useToast();const{register,reset,handleSubmit,formState:{errors,isSubmitting}}=useForm<ShopFormInput, unknown, ShopFormValue>({resolver:zodResolver(shopFormSchema),defaultValues:{name:'',ownerDisplayName:'',address:'',phone:'',businessHours:'',active:true}});useEffect(()=>{if(shop)reset({name:shop.name,ownerDisplayName:shop.ownerDisplayName,address:shop.address,phone:shop.phone,businessHours:shop.businessHours,active:shop.active});},[shop,reset]);if(!shopId)return null;if(loading)return <p>Loading shop settings…</p>;async function submit(value:ShopFormValue){try{await saveShopProfile(shopId,session!.uid,value,shop,file);showToast({type:'success',message:'Shop settings saved.'});setFile(undefined);}catch(error){showToast({type:'error',message:error instanceof Error?error.message:'Could not save shop settings.'});}}return <div className="mx-auto max-w-2xl"><h1 className="mb-4 text-2xl font-extrabold">Shop Settings</h1><form onSubmit={handleSubmit(submit)} className="space-y-4 rounded-lg border bg-background p-5"><Field label="Shop name" error={errors.name?.message}><Input {...register('name')}/></Field><Field label="Owner name" error={errors.ownerDisplayName?.message}><Input {...register('ownerDisplayName')}/></Field><Field label="Phone" error={errors.phone?.message}><Input inputMode="tel" {...register('phone')}/></Field><Field label="Business hours" error={errors.businessHours?.message}><Input {...register('businessHours')}/></Field><Field label="Address" error={errors.address?.message}><Textarea {...register('address')}/></Field><label className="block"><span className="mb-1 block font-semibold">Shop photo</span><Input type="file" accept="image/*" onChange={e=>setFile(e.target.files?.[0])}/></label>{shop?.shopPhotoURL&&<img loading="lazy" decoding="async" src={shop.shopPhotoURL} alt="Current shop" className="h-32 w-48 rounded object-cover"/>}<label className="flex min-h-11 items-center gap-3"><input type="checkbox" {...register('active')}/>Shop is active</label><Button type="submit" disabled={isSubmitting}>{isSubmitting?'Saving…':'Save Settings'}</Button></form></div>}
-function Field({label,error,children}:{label:string;error?:string;children:React.ReactNode}){return <label className="block"><span className="mb-1 block font-semibold">{label}</span>{children}{error&&<span className="text-sm text-destructive" role="alert">{error}</span>}</label>}
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { shopFormSchema, type ShopFormInput, type ShopFormValue } from '@/schemas/shopSchema';
+import { useAuth } from '@/features/auth';
+import { useShop } from '../../hooks/useShop';
+import { saveShopProfile } from '../../services/shopService';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/providers/ToastProvider';
+export function ShopSettingsScreen() {
+  const { session } = useAuth();
+  const shopId = session?.ownerProfile?.shopId ?? '';
+  const { shop, loading } = useShop(shopId);
+  const [file, setFile] = useState<File | undefined>();
+  const { showToast } = useToast();
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ShopFormInput, unknown, ShopFormValue>({
+    resolver: zodResolver(shopFormSchema),
+    defaultValues: {
+      name: '',
+      ownerDisplayName: '',
+      address: '',
+      phone: '',
+      businessHours: '',
+      active: true,
+    },
+  });
+  useEffect(() => {
+    if (shop)
+      reset({
+        name: shop.name,
+        ownerDisplayName: shop.ownerDisplayName,
+        address: shop.address,
+        phone: shop.phone,
+        businessHours: shop.businessHours,
+        active: shop.active,
+      });
+  }, [shop, reset]);
+  if (!shopId) return null;
+  if (loading) return <p>Loading shop settings…</p>;
+  async function submit(value: ShopFormValue) {
+    try {
+      await saveShopProfile(shopId, session!.uid, value, shop, file);
+      showToast({ type: 'success', message: 'Shop settings saved.' });
+      setFile(undefined);
+    } catch (error) {
+      showToast({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Could not save shop settings.',
+      });
+    }
+  }
+  return (
+    <div className="mx-auto max-w-2xl">
+      <h1 className="mb-4 text-2xl font-extrabold">Shop Settings</h1>
+      <form
+        onSubmit={handleSubmit(submit)}
+        className="space-y-4 rounded-lg border bg-background p-5"
+      >
+        <Field label="Shop name" error={errors.name?.message}>
+          <Input {...register('name')} />
+        </Field>
+        <Field label="Owner name" error={errors.ownerDisplayName?.message}>
+          <Input {...register('ownerDisplayName')} />
+        </Field>
+        <Field label="Phone" error={errors.phone?.message}>
+          <Input inputMode="tel" {...register('phone')} />
+        </Field>
+        <Field label="Business hours" error={errors.businessHours?.message}>
+          <Input {...register('businessHours')} />
+        </Field>
+        <Field label="Address" error={errors.address?.message}>
+          <Textarea {...register('address')} />
+        </Field>
+        <label className="block">
+          <span className="mb-1 block font-semibold">Shop photo</span>
+          <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0])} />
+        </label>
+        {shop?.shopPhotoURL && (
+          <img
+            loading="lazy"
+            decoding="async"
+            src={shop.shopPhotoURL}
+            alt="Current shop"
+            className="h-32 w-48 rounded object-cover"
+          />
+        )}
+        <label className="flex min-h-11 items-center gap-3">
+          <input type="checkbox" {...register('active')} />
+          Shop is active
+        </label>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Saving…' : 'Save Settings'}
+        </Button>
+      </form>
+    </div>
+  );
+}
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block font-semibold">{label}</span>
+      {children}
+      {error && (
+        <span className="text-sm text-destructive" role="alert">
+          {error}
+        </span>
+      )}
+    </label>
+  );
+}

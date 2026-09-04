@@ -66,9 +66,12 @@ function resolveFirebaseConfig(useEmulators: boolean): FirebaseWebConfig {
 
 function buildAppConfig(): AppConfig {
   const useEmulators = parseUseEmulators();
-  const defaultShopId = readEnvVar('NEXT_PUBLIC_DEFAULT_SHOP_ID') ?? (useEmulators ? 'demo-shop' : undefined);
+  const defaultShopId =
+    readEnvVar('NEXT_PUBLIC_DEFAULT_SHOP_ID') ?? (useEmulators ? 'demo-shop' : undefined);
   if (!defaultShopId) {
-    throw new Error('Missing NEXT_PUBLIC_DEFAULT_SHOP_ID. Set the shop document id for this storefront.');
+    throw new Error(
+      'Missing NEXT_PUBLIC_DEFAULT_SHOP_ID. Set the shop document id for this storefront.',
+    );
   }
   return {
     firebase: resolveFirebaseConfig(useEmulators),

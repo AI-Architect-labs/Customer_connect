@@ -30,10 +30,13 @@ function getStorageInstance(): FirebaseStorage {
 
 export const storage: FirebaseStorage = getStorageInstance();
 
-
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
-export async function uploadFile(path: string, file: Blob, metadata?: { contentType?: string }): Promise<string> {
+export async function uploadFile(
+  path: string,
+  file: Blob,
+  metadata?: { contentType?: string },
+): Promise<string> {
   const storageRef = ref(storage, path);
   await uploadBytes(storageRef, file, metadata);
   return getDownloadURL(storageRef);

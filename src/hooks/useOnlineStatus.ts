@@ -1,2 +1,19 @@
 'use client';
-import{useEffect,useState}from'react';export function useOnlineStatus(){const[online,setOnline]=useState(true);useEffect(()=>{setOnline(navigator.onLine);const on=()=>setOnline(true),off=()=>setOnline(false);window.addEventListener('online',on);window.addEventListener('offline',off);return()=>{window.removeEventListener('online',on);window.removeEventListener('offline',off);};},[]);return online;}
+import { useSyncExternalStore } from 'react';
+
+function subscribe(callback: () => void) {
+  window.addEventListener('online', callback);
+  window.addEventListener('offline', callback);
+  return () => {
+    window.removeEventListener('online', callback);
+    window.removeEventListener('offline', callback);
+  };
+}
+
+export function useOnlineStatus() {
+  return useSyncExternalStore(
+    subscribe,
+    () => navigator.onLine,
+    () => true,
+  );
+}

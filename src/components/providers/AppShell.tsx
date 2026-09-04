@@ -32,7 +32,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     <ErrorBoundary>
       <AuthProvider>
         <LoadingProvider>
-          <ToastProvider><PwaProvider><OfflineBanner />{children}</PwaProvider></ToastProvider>
+          <ToastProvider>
+            <PwaProvider>
+              <OfflineBanner />
+              {children}
+            </PwaProvider>
+          </ToastProvider>
         </LoadingProvider>
       </AuthProvider>
     </ErrorBoundary>

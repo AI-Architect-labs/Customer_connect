@@ -1,6 +1,121 @@
 'use client';
-import{useEffect,useRef,useState}from'react';import type{RecaptchaVerifier}from'firebase/auth';import{createRecaptchaVerifier,requestPhoneVerification,completePhoneVerification}from'../services/authService';import{normalizedIndianPhoneSchema}from'@/schemas/common';import{Input}from'@/components/ui/Input';import{Button}from'@/components/ui/Button';import{useToast}from'@/components/providers/ToastProvider';
-export function PhoneVerificationPanel({onVerified}:{onVerified?:(phone:string)=>void}){const[phone,setPhone]=useState('');const[verificationId,setVerificationId]=useState<string|null>(null);const[code,setCode]=useState('');const[busy,setBusy]=useState(false);const verifierRef=useRef<RecaptchaVerifier|null>(null);const{showToast}=useToast();useEffect(()=>()=>{verifierRef.current?.clear();},[]);
- async function send(){const parsed=normalizedIndianPhoneSchema.safeParse(phone);if(!parsed.success){showToast({type:'error',message:parsed.error.issues[0]?.message??'Enter a valid mobile number.'});return;}setBusy(true);try{verifierRef.current?.clear();verifierRef.current=createRecaptchaVerifier('phone-recaptcha');const id=await requestPhoneVerification(parsed.data,verifierRef.current);setPhone(parsed.data);setVerificationId(id);showToast({type:'success',message:'OTP sent to your phone.'});}catch(error){verifierRef.current?.clear();verifierRef.current=null;showToast({type:'error',message:error instanceof Error?error.message:'Could not send OTP.'});}finally{setBusy(false);}}
- async function verify(){if(!verificationId||code.trim().length<4)return;setBusy(true);try{const result=await completePhoneVerification(verificationId,code.trim());const verified=result.user.phoneNumber??phone;showToast({type:'success',message:'Phone verified.'});onVerified?.(verified);}catch(error){showToast({type:'error',message:error instanceof Error?error.message:'Invalid OTP. Please try again.'});}finally{setBusy(false);}}
- return <div className="mx-auto max-w-md rounded-lg border bg-background p-5"><h2 className="text-xl font-bold">Verify your phone</h2><p className="mt-1 text-sm text-muted-foreground">OTP verification protects your order history from other people.</p><div id="phone-recaptcha" className="mt-2"/>{!verificationId?<div className="mt-4 space-y-3"><Input inputMode="tel" placeholder="10-digit mobile number" value={phone} onChange={e=>setPhone(e.target.value)} aria-label="Mobile number"/><Button className="w-full" onClick={()=>void send()} disabled={busy}>{busy?'Sending…':'Send OTP'}</Button></div>:<div className="mt-4 space-y-3"><p className="text-sm">OTP sent to <strong>{phone}</strong></p><Input inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="Enter OTP" value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,''))} aria-label="OTP code"/><Button className="w-full" onClick={()=>void verify()} disabled={busy}>{busy?'Verifying…':'Verify OTP'}</Button><button className="min-h-11 w-full text-sm font-semibold text-primary" onClick={()=>{setVerificationId(null);setCode('');}}>Use another number</button></div>}</div>}
+import { useEffect, useRef, useState } from 'react';
+import type { RecaptchaVerifier } from 'firebase/auth';
+import {
+  createRecaptchaVerifier,
+  requestPhoneVerification,
+  completePhoneVerification,
+} from '../services/authService';
+import { normalizedIndianPhoneSchema } from '@/schemas/common';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { useToast } from '@/components/providers/ToastProvider';
+export function PhoneVerificationPanel({ onVerified }: { onVerified?: (phone: string) => void }) {
+  const [phone, setPhone] = useState('');
+  const [verificationId, setVerificationId] = useState<string | null>(null);
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const verifierRef = useRef<RecaptchaVerifier | null>(null);
+  const { showToast } = useToast();
+  useEffect(
+    () => () => {
+      verifierRef.current?.clear();
+    },
+    [],
+  );
+  async function send() {
+    const parsed = normalizedIndianPhoneSchema.safeParse(phone);
+    if (!parsed.success) {
+      showToast({
+        type: 'error',
+        message: parsed.error.issues[0]?.message ?? 'Enter a valid mobile number.',
+      });
+      return;
+    }
+    setBusy(true);
+    try {
+      verifierRef.current?.clear();
+      verifierRef.current = createRecaptchaVerifier('phone-recaptcha');
+      const id = await requestPhoneVerification(parsed.data, verifierRef.current);
+      setPhone(parsed.data);
+      setVerificationId(id);
+      showToast({ type: 'success', message: 'OTP sent to your phone.' });
+    } catch (error) {
+      verifierRef.current?.clear();
+      verifierRef.current = null;
+      showToast({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Could not send OTP.',
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function verify() {
+    if (!verificationId || code.trim().length < 4) return;
+    setBusy(true);
+    try {
+      const result = await completePhoneVerification(verificationId, code.trim());
+      const verified = result.user.phoneNumber ?? phone;
+      showToast({ type: 'success', message: 'Phone verified.' });
+      onVerified?.(verified);
+    } catch (error) {
+      showToast({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Invalid OTP. Please try again.',
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="mx-auto max-w-md rounded-lg border bg-background p-5">
+      <h2 className="text-xl font-bold">Verify your phone</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        OTP verification protects your order history from other people.
+      </p>
+      <div id="phone-recaptcha" className="mt-2" />
+      {!verificationId ? (
+        <div className="mt-4 space-y-3">
+          <Input
+            inputMode="tel"
+            placeholder="10-digit mobile number"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            aria-label="Mobile number"
+          />
+          <Button className="w-full" onClick={() => void send()} disabled={busy}>
+            {busy ? 'Sending…' : 'Send OTP'}
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-4 space-y-3">
+          <p className="text-sm">
+            OTP sent to <strong>{phone}</strong>
+          </p>
+          <Input
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            placeholder="Enter OTP"
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+            aria-label="OTP code"
+          />
+          <Button className="w-full" onClick={() => void verify()} disabled={busy}>
+            {busy ? 'Verifying…' : 'Verify OTP'}
+          </Button>
+          <button
+            className="min-h-11 w-full text-sm font-semibold text-primary"
+            onClick={() => {
+              setVerificationId(null);
+              setCode('');
+            }}
+          >
+            Use another number
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

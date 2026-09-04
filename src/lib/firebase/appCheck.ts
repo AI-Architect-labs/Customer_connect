@@ -1,2 +1,13 @@
 'use client';
-import{initializeAppCheck,ReCaptchaV3Provider,type AppCheck}from'firebase/app-check';import{firebaseApp}from'./client';import{appConfig}from'@/config/env';let instance:AppCheck|undefined;export function initializeFirebaseAppCheck():AppCheck|null{if(appConfig.useEmulators||!appConfig.appCheckSiteKey)return null;instance??=initializeAppCheck(firebaseApp,{provider:new ReCaptchaV3Provider(appConfig.appCheckSiteKey),isTokenAutoRefreshEnabled:true});return instance;}
+import { initializeAppCheck, ReCaptchaV3Provider, type AppCheck } from 'firebase/app-check';
+import { firebaseApp } from './client';
+import { appConfig } from '@/config/env';
+let instance: AppCheck | undefined;
+export function initializeFirebaseAppCheck(): AppCheck | null {
+  if (appConfig.useEmulators || !appConfig.appCheckSiteKey) return null;
+  instance ??= initializeAppCheck(firebaseApp, {
+    provider: new ReCaptchaV3Provider(appConfig.appCheckSiteKey),
+    isTokenAutoRefreshEnabled: true,
+  });
+  return instance;
+}

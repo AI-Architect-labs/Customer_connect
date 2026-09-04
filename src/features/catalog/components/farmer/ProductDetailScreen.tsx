@@ -1,3 +1,91 @@
 'use client';
-import{useState}from'react';import{ShoppingCart,Phone}from'lucide-react';import{appConfig}from'@/config/env';import{useProduct}from'../../hooks/useProduct';import{useShop}from'@/features/shop-profile';import{AvailabilityBadge}from'@/components/shared/AvailabilityBadge';import{PriceTag}from'@/components/shared/PriceTag';import{QuantityStepper}from'@/components/shared/QuantityStepper';import{Button}from'@/components/ui/Button';import{useCartStore}from'@/store/cartStore';
-export function ProductDetailScreen({productId}:{productId:string}){const shopId=appConfig.defaultShopId;const{product,loading}=useProduct(shopId,productId);const{shop}=useShop(shopId);const[qty,setQty]=useState(1);const add=useCartStore(s=>s.add);const[index,setIndex]=useState(0);if(loading)return <main className="p-4">Loading product…</main>;if(!product)return <main className="p-4"><h1 className="text-2xl font-bold">Product not found</h1></main>;const image=product.images[index]??product.images[0];return <main className="p-4"><div className="grid gap-6 md:grid-cols-2"><section><div className="aspect-square overflow-hidden rounded-lg bg-muted">{image?.url?<img src={image.url} alt={`${product.name} image ${index+1}`} className="h-full w-full object-cover"/>:null}</div>{product.images.length>1&&<div className="mt-2 flex gap-2 overflow-x-auto">{product.images.map((i,idx)=><button key={i.id} onClick={()=>setIndex(idx)} className={`h-16 w-16 shrink-0 overflow-hidden rounded border-2 ${idx===index?'border-primary':'border-transparent'}`} aria-label={`View image ${idx+1}`}><img src={i.url} alt="" className="h-full w-full object-cover"/></button>)}</div>}</section><section className="space-y-4"><div><h1 className="text-3xl font-extrabold">{product.name}</h1>{product.brand&&<p className="mt-1 text-lg text-muted-foreground">{product.brand}</p>}</div><PriceTag mrp={product.mrp} discountPrice={product.discountPrice}/><AvailabilityBadge status={product.availabilityStatus}/><p className="font-medium">Pack: {product.packSize} {product.unit}</p>{product.description&&<p className="whitespace-pre-line text-muted-foreground">{product.description}</p>}<QuantityStepper value={qty} onChange={setQty}/><Button size="lg" className="w-full" disabled={product.availabilityStatus==='out_of_stock'} onClick={()=>add(product,qty)}><ShoppingCart className="mr-2 h-5 w-5"/>Add {qty} to Cart</Button>{shop?.phone&&<a href={`tel:${shop.phone}`} className="flex min-h-12 items-center justify-center gap-2 rounded-md border font-semibold text-primary"><Phone className="h-5 w-5"/>Call Shop</a>}</section></div></main>}
+import { useState } from 'react';
+import { ShoppingCart, Phone } from 'lucide-react';
+import { appConfig } from '@/config/env';
+import { useProduct } from '../../hooks/useProduct';
+import { useShop } from '@/features/shop-profile';
+import { AvailabilityBadge } from '@/components/shared/AvailabilityBadge';
+import { PriceTag } from '@/components/shared/PriceTag';
+import { QuantityStepper } from '@/components/shared/QuantityStepper';
+import { Button } from '@/components/ui/Button';
+import { useCartStore } from '@/store/cartStore';
+export function ProductDetailScreen({ productId }: { productId: string }) {
+  const shopId = appConfig.defaultShopId;
+  const { product, loading } = useProduct(shopId, productId);
+  const { shop } = useShop(shopId);
+  const [qty, setQty] = useState(1);
+  const add = useCartStore((s) => s.add);
+  const [index, setIndex] = useState(0);
+  if (loading) return <main className="p-4">Loading product…</main>;
+  if (!product)
+    return (
+      <main className="p-4">
+        <h1 className="text-2xl font-bold">Product not found</h1>
+      </main>
+    );
+  const image = product.images[index] ?? product.images[0];
+  return (
+    <main className="p-4">
+      <div className="grid gap-6 md:grid-cols-2">
+        <section>
+          <div className="aspect-square overflow-hidden rounded-lg bg-muted">
+            {image?.url ? (
+              <img
+                src={image.url}
+                alt={`${product.name} image ${index + 1}`}
+                className="h-full w-full object-cover"
+              />
+            ) : null}
+          </div>
+          {product.images.length > 1 && (
+            <div className="mt-2 flex gap-2 overflow-x-auto">
+              {product.images.map((i, idx) => (
+                <button
+                  key={i.id}
+                  onClick={() => setIndex(idx)}
+                  className={`h-16 w-16 shrink-0 overflow-hidden rounded border-2 ${idx === index ? 'border-primary' : 'border-transparent'}`}
+                  aria-label={`View image ${idx + 1}`}
+                >
+                  <img src={i.url} alt="" className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+        <section className="space-y-4">
+          <div>
+            <h1 className="text-3xl font-extrabold">{product.name}</h1>
+            {product.brand && <p className="mt-1 text-lg text-muted-foreground">{product.brand}</p>}
+          </div>
+          <PriceTag mrp={product.mrp} discountPrice={product.discountPrice} />
+          <AvailabilityBadge status={product.availabilityStatus} />
+          <p className="font-medium">
+            Pack: {product.packSize} {product.unit}
+          </p>
+          {product.description && (
+            <p className="whitespace-pre-line text-muted-foreground">{product.description}</p>
+          )}
+          <QuantityStepper value={qty} onChange={setQty} />
+          <Button
+            size="lg"
+            className="w-full"
+            disabled={product.availabilityStatus === 'out_of_stock'}
+            onClick={() => add(product, qty)}
+          >
+            <ShoppingCart className="mr-2 h-5 w-5" />
+            Add {qty} to Cart
+          </Button>
+          {shop?.phone && (
+            <a
+              href={`tel:${shop.phone}`}
+              className="flex min-h-12 items-center justify-center gap-2 rounded-md border font-semibold text-primary"
+            >
+              <Phone className="h-5 w-5" />
+              Call Shop
+            </a>
+          )}
+        </section>
+      </div>
+    </main>
+  );
+}

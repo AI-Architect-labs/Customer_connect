@@ -1,1 +1,4 @@
-import{CartScreen}from'@/features/cart/components/CartScreen';export default function Page(){return <CartScreen/>;}
+import { CartScreen } from '@/features/cart/components/CartScreen';
+export default function Page() {
+  return <CartScreen />;
+}

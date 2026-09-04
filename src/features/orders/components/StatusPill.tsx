@@ -1,1 +1,24 @@
-import type{OrderStatus}from'@/constants/enums';import{cn}from'@/lib/utils';const labels:Record<OrderStatus,string>={placed:'Placed',confirmed:'Confirmed',out_for_delivery:'Out for Delivery',delivered:'Delivered',cancelled:'Cancelled'};export default function StatusPill({status}:{status:OrderStatus}){return <span className={cn('rounded-full px-2.5 py-1 text-xs font-bold',status==='delivered'&&'bg-success-tint text-success',status==='cancelled'&&'bg-red-50 text-destructive',status==='placed'&&'bg-warning-tint text-warning',(status==='confirmed'||status==='out_for_delivery')&&'bg-blue-50 text-blue-700')}>{labels[status]}</span>}
+import type { OrderStatus } from '@/constants/enums';
+import { cn } from '@/lib/utils';
+const labels: Record<OrderStatus, string> = {
+  placed: 'Placed',
+  confirmed: 'Confirmed',
+  out_for_delivery: 'Out for Delivery',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+};
+export default function StatusPill({ status }: { status: OrderStatus }) {
+  return (
+    <span
+      className={cn(
+        'rounded-full px-2.5 py-1 text-xs font-bold',
+        status === 'delivered' && 'bg-success-tint text-success',
+        status === 'cancelled' && 'bg-red-50 text-destructive',
+        status === 'placed' && 'bg-warning-tint text-warning',
+        (status === 'confirmed' || status === 'out_for_delivery') && 'bg-blue-50 text-blue-700',
+      )}
+    >
+      {labels[status]}
+    </span>
+  );
+}

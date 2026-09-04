@@ -56,8 +56,7 @@ export async function signInWithOwnerCredentials(email: string, password: string
 
 /**
  * Signs out the current session, regardless of which tier it was. Wired to
- * the owner-facing "Logout" action on the (temporary) dashboard
- * verification page in this milestone.
+ * the owner-facing Logout action in the protected owner experience.
  */
 export async function signOutCurrentUser(): Promise<void> {
   await firebaseSignOut(auth);
@@ -94,12 +93,8 @@ export async function signInAnonymouslyIfNeeded(): Promise<void> {
  * order history and any data already associated with their anonymous UID
  * remains associated with them after linking a phone number.
  *
- * Not yet called from any UI in this milestone. Sprint 6 (My Orders /
- * order history, PRD screens F8-F9) will call this after completing phone
- * verification: send an OTP via `PhoneAuthProvider` (which requires a
- * reCAPTCHA-bound DOM container that only exists once that screen is
- * built), build a credential from the returned verification ID + the
- * code the farmer enters, then pass that credential here.
+ * The My Orders phone-verification UI uses the same credential-linking
+ * behavior through `completePhoneVerification` below.
  */
 export async function linkPhoneCredentialToCurrentUser(
   credential: AuthCredential,
@@ -111,7 +106,6 @@ export async function linkPhoneCredentialToCurrentUser(
   }
   return linkWithCredential(auth.currentUser, credential);
 }
-
 
 export function createRecaptchaVerifier(containerId: string): RecaptchaVerifier {
   return new RecaptchaVerifier(auth, containerId, { size: 'invisible' });
@@ -136,8 +130,14 @@ export async function completePhoneVerification(
   try {
     return await linkWithCredential(auth.currentUser, credential);
   } catch (error: unknown) {
-    const codeValue = typeof error === 'object' && error && 'code' in error ? String((error as { code?: unknown }).code) : '';
-    if (codeValue === 'auth/credential-already-in-use' || codeValue === 'auth/provider-already-linked') {
+    const codeValue =
+      typeof error === 'object' && error && 'code' in error
+        ? String((error as { code?: unknown }).code)
+        : '';
+    if (
+      codeValue === 'auth/credential-already-in-use' ||
+      codeValue === 'auth/provider-already-linked'
+    ) {
       return signInWithCredential(auth, credential);
     }
     throw error;

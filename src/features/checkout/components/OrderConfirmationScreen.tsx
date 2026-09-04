@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -13,16 +13,16 @@ interface LastOrder {
 }
 
 export function OrderConfirmationScreen() {
-  const [data, setData] = useState<LastOrder | null>(null);
-
-  useEffect(() => {
+  const [data] = useState<LastOrder | null>(() => {
+    if (typeof window === 'undefined') return null;
     try {
       const raw = sessionStorage.getItem('agriconnect-last-order');
-      if (raw) setData(JSON.parse(raw) as LastOrder);
+      return raw ? (JSON.parse(raw) as LastOrder) : null;
     } catch {
       // Confirmation still renders if session storage is unavailable.
+      return null;
     }
-  }, []);
+  });
 
   return (
     <main className="p-4">

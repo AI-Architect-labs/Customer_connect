@@ -5,21 +5,21 @@ import { subscribeOrder } from '@/lib/repositories/orderRepository';
 import type { Order } from '@/types/order';
 
 export function useOrder(shopId: string, orderId: string, enabled = true) {
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(enabled);
+  const requestKey = enabled && shopId && orderId ? `${shopId}:${orderId}` : '';
+  const [result, setResult] = useState<{ key: string; order: Order | null }>({
+    key: '',
+    order: null,
+  });
 
   useEffect(() => {
-    if (!enabled || !shopId || !orderId) {
-      setOrder(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
+    if (!requestKey) return;
     return subscribeOrder(shopId, orderId, (value) => {
-      setOrder(value);
-      setLoading(false);
+      setResult({ key: requestKey, order: value });
     });
-  }, [shopId, orderId, enabled]);
+  }, [shopId, orderId, requestKey]);
 
-  return { order, loading };
+  return {
+    order: requestKey && result.key === requestKey ? result.order : null,
+    loading: Boolean(requestKey) && result.key !== requestKey,
+  };
 }

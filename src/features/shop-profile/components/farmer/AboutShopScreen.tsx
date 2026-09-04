@@ -1,3 +1,55 @@
 'use client';
-import{Clock,MapPin,Phone,Store}from'lucide-react';import{appConfig}from'@/config/env';import{useShop}from'../../hooks/useShop';import{EmptyState}from'@/components/shared/EmptyState';
-export function AboutShopScreen(){const{shop,loading}=useShop(appConfig.defaultShopId);if(loading)return <main className="p-4">Loading shop…</main>;if(!shop)return <main className="p-4"><EmptyState title="Shop profile is not ready" message="Please check back soon." icon={<Store className="h-12 w-12"/>}/></main>;return <main className="p-4"><div className="mx-auto max-w-2xl overflow-hidden rounded-lg border bg-background shadow-sm">{shop.shopPhotoURL&&<img loading="lazy" decoding="async" src={shop.shopPhotoURL} alt={`${shop.name} shop`} className="h-56 w-full object-cover"/>}<div className="space-y-4 p-5"><div><h1 className="text-3xl font-extrabold">{shop.name}</h1><p className="text-muted-foreground">Owned by {shop.ownerDisplayName}</p></div><p className="flex gap-3"><MapPin className="mt-1 h-5 w-5 shrink-0 text-primary"/>{shop.address}</p><p className="flex gap-3"><Clock className="h-5 w-5 shrink-0 text-primary"/>{shop.businessHours}</p><a href={`tel:${shop.phone}`} className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 font-bold text-primary-foreground"><Phone className="h-5 w-5"/>Call Shop — {shop.phone}</a></div></div></main>}
+import { Clock, MapPin, Phone, Store } from 'lucide-react';
+import { appConfig } from '@/config/env';
+import { useShop } from '../../hooks/useShop';
+import { EmptyState } from '@/components/shared/EmptyState';
+export function AboutShopScreen() {
+  const { shop, loading } = useShop(appConfig.defaultShopId);
+  if (loading) return <main className="p-4">Loading shop…</main>;
+  if (!shop)
+    return (
+      <main className="p-4">
+        <EmptyState
+          title="Shop profile is not ready"
+          message="Please check back soon."
+          icon={<Store className="h-12 w-12" />}
+        />
+      </main>
+    );
+  return (
+    <main className="p-4">
+      <div className="mx-auto max-w-2xl overflow-hidden rounded-lg border bg-background shadow-sm">
+        {shop.shopPhotoURL && (
+          <img
+            loading="lazy"
+            decoding="async"
+            src={shop.shopPhotoURL}
+            alt={`${shop.name} shop`}
+            className="h-56 w-full object-cover"
+          />
+        )}
+        <div className="space-y-4 p-5">
+          <div>
+            <h1 className="text-3xl font-extrabold">{shop.name}</h1>
+            <p className="text-muted-foreground">Owned by {shop.ownerDisplayName}</p>
+          </div>
+          <p className="flex gap-3">
+            <MapPin className="mt-1 h-5 w-5 shrink-0 text-primary" />
+            {shop.address}
+          </p>
+          <p className="flex gap-3">
+            <Clock className="h-5 w-5 shrink-0 text-primary" />
+            {shop.businessHours}
+          </p>
+          <a
+            href={`tel:${shop.phone}`}
+            className="flex min-h-12 items-center justify-center gap-2 rounded-md bg-primary px-4 font-bold text-primary-foreground"
+          >
+            <Phone className="h-5 w-5" />
+            Call Shop — {shop.phone}
+          </a>
+        </div>
+      </div>
+    </main>
+  );
+}

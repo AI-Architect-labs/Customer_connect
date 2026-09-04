@@ -14,9 +14,12 @@ export const productFormSchema = z
     stockQty: z.union([z.coerce.number().int().min(0), z.literal(''), z.undefined()]),
     active: z.boolean(),
   })
-  .refine((v) => v.discountPrice === '' || v.discountPrice === undefined || v.discountPrice <= v.mrp, {
-    path: ['discountPrice'],
-    message: 'Discount price cannot exceed MRP.',
-  });
+  .refine(
+    (v) => v.discountPrice === '' || v.discountPrice === undefined || v.discountPrice <= v.mrp,
+    {
+      path: ['discountPrice'],
+      message: 'Discount price cannot exceed MRP.',
+    },
+  );
 export type ProductFormInput = z.input<typeof productFormSchema>;
 export type ProductFormValue = z.output<typeof productFormSchema>;

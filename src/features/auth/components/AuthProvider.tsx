@@ -66,7 +66,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // session has no owner document by definition and should resolve
       // normally regardless of any Firestore error.
       let ownerProfile = null;
-      const couldBeOwner = !user.isAnonymous && user.providerData.some((provider) => provider.providerId === 'password');
+      const couldBeOwner =
+        !user.isAnonymous &&
+        user.providerData.some((provider) => provider.providerId === 'password');
       if (couldBeOwner) {
         try {
           ownerProfile = await getOwnerByUid(user.uid);

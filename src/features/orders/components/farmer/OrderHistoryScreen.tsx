@@ -1,3 +1,50 @@
 'use client';
-import Link from'next/link';import{ReceiptText}from'lucide-react';import{appConfig}from'@/config/env';import{useAuth,PhoneVerificationPanel}from'@/features/auth';import{useOrderHistory}from'../../hooks/useOrderHistory';import{EmptyState}from'@/components/shared/EmptyState';import{StatusPill}from'@/features/orders/components/StatusPill';
-export function OrderHistoryScreen(){const{session,isLoading}=useAuth();const phone=session?.tier==='phone-linked'?session.phoneNumber??undefined:undefined;const{orders,loading}=useOrderHistory(appConfig.defaultShopId,phone);if(isLoading)return <main className="p-4">Checking session…</main>;return <main className="p-4"><h1 className="mb-4 text-2xl font-extrabold">My Orders</h1>{!phone?<PhoneVerificationPanel/>:loading?<p>Loading orders…</p>:orders.length===0?<EmptyState title="No orders yet" message="Orders placed with this phone number will appear here." icon={<ReceiptText className="h-12 w-12"/>}/>:<div className="space-y-3">{orders.map(o=><Link key={o.id} href={`/orders/${o.id}`} className="block rounded-lg border bg-background p-4 shadow-sm"><div className="flex items-start justify-between gap-3"><div><p className="font-bold">Order #{o.id.slice(0,8)}</p><p className="text-sm text-muted-foreground">{o.items.length} item(s) · ₹{o.subtotal.toLocaleString('en-IN')}</p></div><StatusPill status={o.status}/></div></Link>)}</div>}</main>}
+import Link from 'next/link';
+import { ReceiptText } from 'lucide-react';
+import { appConfig } from '@/config/env';
+import { useAuth, PhoneVerificationPanel } from '@/features/auth';
+import { useOrderHistory } from '../../hooks/useOrderHistory';
+import { EmptyState } from '@/components/shared/EmptyState';
+import StatusPill from '@/features/orders/components/StatusPill';
+export function OrderHistoryScreen() {
+  const { session, isLoading } = useAuth();
+  const phone = session?.tier === 'phone-linked' ? (session.phoneNumber ?? undefined) : undefined;
+  const { orders, loading } = useOrderHistory(appConfig.defaultShopId, phone);
+  if (isLoading) return <main className="p-4">Checking session…</main>;
+  return (
+    <main className="p-4">
+      <h1 className="mb-4 text-2xl font-extrabold">My Orders</h1>
+      {!phone ? (
+        <PhoneVerificationPanel />
+      ) : loading ? (
+        <p>Loading orders…</p>
+      ) : orders.length === 0 ? (
+        <EmptyState
+          title="No orders yet"
+          message="Orders placed with this phone number will appear here."
+          icon={<ReceiptText className="h-12 w-12" />}
+        />
+      ) : (
+        <div className="space-y-3">
+          {orders.map((o) => (
+            <Link
+              key={o.id}
+              href={`/orders/${o.id}`}
+              className="block rounded-lg border bg-background p-4 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-bold">Order #{o.id.slice(0, 8)}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {o.items.length} item(s) · ₹{o.subtotal.toLocaleString('en-IN')}
+                  </p>
+                </div>
+                <StatusPill status={o.status} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}

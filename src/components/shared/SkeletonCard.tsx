@@ -1,1 +1,9 @@
-export function SkeletonCard(){return <div className="animate-pulse rounded-lg border p-3"><div className="mb-3 aspect-[4/3] rounded-md bg-muted"/><div className="mb-2 h-5 w-3/4 rounded bg-muted"/><div className="h-4 w-1/2 rounded bg-muted"/></div>;}
+export function SkeletonCard() {
+  return (
+    <div className="animate-pulse rounded-lg border p-3">
+      <div className="mb-3 aspect-[4/3] rounded-md bg-muted" />
+      <div className="mb-2 h-5 w-3/4 rounded bg-muted" />
+      <div className="h-4 w-1/2 rounded bg-muted" />
+    </div>
+  );
+}
