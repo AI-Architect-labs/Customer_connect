@@ -6,7 +6,7 @@ Security Rules allow/deny tests. These are mandatory CI gates for data-access ch
 
 ## Stack / Tools
 
-Vitest, @firebase/rules-unit-testing, Firestore Emulator.
+Vitest, @firebase/rules-unit-testing, and the Firebase Auth, Firestore, and Storage emulators. Run `npm run test:rules` from the repository root under Node 20 with Java 21 available on `PATH` and through `JAVA_HOME`.
 
 ## Why this directory exists
 

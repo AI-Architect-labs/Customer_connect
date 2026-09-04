@@ -1,8 +1,8 @@
 # AgriConnect — Project State
 
-**Last Updated:** 2026-08-31
-**Current Phase:** V1 implementation complete; dependency-backed verification and real Firebase staging setup pending
-**Overall Status:** 🟡 Feature-complete codebase, not yet production-deployed
+**Last Updated:** 2026-09-03
+**Current Phase:** V1 local verification complete; real Firebase staging setup pending
+**Overall Status:** App, Functions, Firestore Rules, and Storage Rules pass locally; real environments remain unverified
 
 ## 1. Source of truth
 
@@ -69,20 +69,28 @@ See `docs/ImplementationSecurityAddendum.md`. The most important are:
 
 ## 4. Dependency/verification status
 
-Completed in the current build environment:
+Locally verified on the developer PC on 2026-09-02 under Node.js 20.20.2, npm 10.8.2, and OpenJDK 21.0.12.1:
 
-- Repository/file-structure validation.
-- TypeScript/TSX parser pass over all source and function files: **0 syntax parse errors**.
-- Route collision analysis: **0 conflicting Next.js routes** after `/owner/*` correction.
-- README coverage check: **every current directory has README.md**.
+- Reproducible dependency setup with `npm ci`, `npm --prefix functions ci`, and `python -m pip install -r requirements.txt`.
+- TypeScript type-check, ESLint, Prettier, 5 unit tests, Cloud Functions build, Next.js production build, and `npm run verify`.
+- All 5 Firestore Rules tests and all 4 Storage Rules tests pass against their emulators.
+- Repository/file-structure and route validation, with no nested Git repository or conflicting Next.js routes.
+- README coverage check: **every current source/project directory has README.md**.
 - `.gitignore`, CI, Firebase rules/index/config, PWA assets and setup manifests are present.
 
-Still required before claiming production readiness:
+The prior Storage HTTP 400 / `storage/unknown` failure was caused by running Firebase
+Storage's browser transport in Vitest's global `jsdom` environment. The Rules suites
+now explicitly use Vitest's Node environment; project `agriconnect-dev`, bucket
+`agriconnect-dev.appspot.com`, ports, and production rules remain aligned and unchanged.
 
-- `npm run setup` on a machine with npm registry access (this build environment could not complete npm downloads).
-- Commit generated `package-lock.json` and `functions/package-lock.json` after successful installation.
-- `npm run verify`.
-- `npm run test:rules` with the downloadable Firestore emulator JAR.
+Dependency audit after targeted non-breaking upgrades: root has 8 moderate findings
+and no high/critical findings; Functions has 12 moderate findings and no high/critical
+findings. Remaining items are transitive Firebase CLI/Admin/Functions dependency-chain
+advisories whose npm-proposed remediation is a breaking major downgrade; no forced
+remediation was applied.
+
+Still required before claiming staging or production readiness:
+
 - Real Firebase dev/staging/prod projects and `.firebaserc` ids.
 - Real owner bootstrap.
 - Phone OTP test on a real browser/phone.
@@ -94,20 +102,21 @@ Still required before claiming production readiness:
 ## 5. Current deployment blockers
 
 1. Real Firebase projects have not been created/configured in this environment.
-2. `.firebaserc` still contains placeholder ids.
-3. npm dependencies could not be downloaded in this execution environment, so the final semantic TypeScript/lint/Next build gates have not yet been run against the expanded V1 source.
-4. Cloud Functions require Blaze billing. The app is optimized for low usage/free quotas but cannot promise an absolute ₹0 bill after enabling billing.
+2. The Firebase project ids in `.firebaserc` have not been verified against accessible real projects.
+3. Root and Functions dependency trees retain the moderate-only transitive findings documented above.
+4. Real browser/device checks remain pending for phone OTP, Storage uploads, FCM, App Check and owner acceptance.
+5. Cloud Functions require Blaze billing. The app is optimized for low usage/free quotas but cannot promise an absolute ₹0 bill after enabling billing.
 
 ## 6. Immediate next action
 
-On the developer PC:
+Perform Firebase staging setup only after reviewing the local verification result:
 
 ```bash
-npm run setup
-cp .env.local.example .env.local
 npm run verify
-npm run emulators
-npm run test:rules
+npm run verify:all
 ```
 
-Fix any dependency-version/type/lint issues surfaced by those real toolchains before creating the production Firebase projects. Then follow `docs/Deployment.md` from staging through owner acceptance and production launch.
+Local and emulator verification is complete. Functions-specific automated tests and
+cross-service integration tests are still absent. Follow `docs/Deployment.md` from
+staging through owner acceptance and production launch; staging and production have
+not been verified.

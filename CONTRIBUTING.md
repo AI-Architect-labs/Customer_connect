@@ -13,13 +13,17 @@ Read:
 
 ## Setup
 
+Use Node.js 20 as declared by `.nvmrc` and `package.json`. Java 21 is needed only when running the Firebase emulators or Security Rules tests; AgriConnect application code does not use Java.
+
 ```bash
-npm run setup
+npm ci
+npm --prefix functions ci
+python -m pip install -r requirements.txt
 cp .env.local.example .env.local
 npm run emulators
 ```
 
-Use short-lived branches from `main`, e.g. `feature/catalog-search` or `fix/order-cancellation`. This repository follows the approved trunk-based plan; do not add a long-lived `develop` branch unless the project explicitly changes that decision.
+Use short-lived branches from `develop`, e.g. `feature/catalog-search` or `fix/order-cancellation`. The current promotion flow is `feature/*` -> `develop` -> `staging` -> `main`; keep all three long-lived branches and promote only after the relevant quality gates pass.
 
 ## Dependency direction
 
@@ -54,8 +58,12 @@ Husky, lint-staged and Commitlint run locally.
 
 ```bash
 npm run verify
-npm run test:rules
+npm run verify:all
 ```
+
+Use `npm run verify` for the fast app/functions gate while iterating. The complete
+`npm run verify:all` gate includes Firebase Security Rules tests, requires Java 21,
+and must pass before a PR or release.
 
 Also manually test the affected real user journey on mobile when UI/auth/storage/push behavior changes.
 

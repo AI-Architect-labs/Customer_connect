@@ -20,7 +20,7 @@ AgriConnect is a production-oriented Progressive Web App for a local agricultura
 
 ## One-command development setup
 
-Prerequisites: **Node.js 20+**, **npm**, **Python 3.10+**, and **Java 21** (for Firebase Firestore/Storage emulators).
+Prerequisites: **Node.js 20** (pinned by `.nvmrc`), **npm**, and **Python 3.10+**. **Java 21 is required only for Firebase Emulator Suite and Security Rules tests; it is not part of AgriConnect application development or its production runtime.**
 
 ```bash
 npm run setup
@@ -129,11 +129,17 @@ npm --prefix functions run build
 npm run test:rules
 ```
 
+`npm run test:rules` starts the local Auth, Firestore, and Storage emulators and requires Java 21. It does not access staging or production data.
+
 Or, after dependencies are installed:
 
 ```bash
 npm run verify
+npm run verify:all
 ```
+
+`npm run verify` is the fast app/functions quality gate. `npm run verify:all` adds the
+Java-backed Firebase Security Rules tests and is required before a PR or release.
 
 ## Documentation
 
