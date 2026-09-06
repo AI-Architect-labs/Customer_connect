@@ -44,5 +44,11 @@
       "tests/**",
       "docs/**"
     ]
+  },
+  "auth": {
+    "providers": {
+      "anonymous": true,
+      "emailPassword": true
+    }
   }
 }
