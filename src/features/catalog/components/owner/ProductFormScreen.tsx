@@ -193,10 +193,11 @@ export function ProductFormScreen({ productId }: { productId?: string }) {
                   </div>
                   <button
                     type="button"
+                    disabled={product.images.length <= 1}
                     className="min-h-8 w-full text-xs font-semibold text-destructive"
                     onClick={() => void removeProductImage(shopId, product, i.id, session!.uid)}
                   >
-                    Remove
+                    {product.images.length <= 1 ? 'Required image' : 'Remove'}
                   </button>
                 </div>
               ))}

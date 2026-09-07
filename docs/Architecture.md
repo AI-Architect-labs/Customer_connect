@@ -470,6 +470,8 @@ Firestore Security Rules have no native concept of rate limiting (e.g., "max 5 o
 - All free-text fields (address, village, landmark, customer name, product description) are treated as **display-only data**, never interpolated into executable contexts (no server-side templating, no direct HTML injection risk since React escapes rendered text by default).
 - Phone numbers are normalized to a consistent format (e.g., `+91XXXXXXXXXX`) at the point of entry in the service layer, both for consistent customer-document keying and to reduce malformed-data edge cases.
 - File uploads (product/shop images) are constrained by file type and size at both the client (immediate feedback) and Storage rules (authoritative) layers.
+- Product image uploads use application-level compensation because Firestore and Storage cannot share an atomic transaction. Each newly uploaded path is recorded; if a later upload or the product document write fails, only objects uploaded by that attempt are deleted on a best-effort basis. Images that existed before an edit are never part of this rollback set.
+- Product deletion remains a soft-delete: its images are retained so the product can be restored and historical/audit context remains intact. Permanent object purging is a separate future retention-policy operation, not part of ordinary product deletion.
 
 ---
 
